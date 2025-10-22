@@ -10,3 +10,14 @@ body {
 h1, h2, h3, h4, h5, h6 {
   @apply font-heading text-brand-dark;
 }
+/* Animación pulse lenta y respetuosa con preferencias de motion */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pulse-slow {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+  .animate-pulse-slow {
+    animation: pulse-slow 2.8s ease-in-out infinite;
+  }
+}
