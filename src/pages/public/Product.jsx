@@ -1,55 +1,142 @@
-import { useParams } from "react-router-dom";
+// src/pages/Product.jsx
+import { useParams, Link } from "react-router-dom";
 import { mockProducts } from "../../data/mockData";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import ImageGallery from "../../components/ImageGallery";
+import RelatedProducts from "../../components/RelatedProducts";
+import { FaWhatsapp } from "react-icons/fa";
 
-function Product() {
+export default function ProductPage() { 
     const { slug } = useParams();
     const product = mockProducts.find((p) => p.slug === slug);
 
     if (!product) {
         return (
-            <div className="container mx-auto py-16 text-center text-gray-600">
-                <h1 className="text-3xl font-heading text-brand mb-4">
-                    Producto no encontrado
-                </h1>
-                <p>El artículo que buscas no existe.</p>
+            <div className="container mx-auto px-4 py-16 text-center">
+                <h1 className="text-2xl font-heading text-text mb-4">Producto no encontrado</h1>
+                <p className="text-text-light">El producto solicitado no existe o fue movido.</p>
+                <Link to="/catalogo" className="mt-6 inline-block btn btn-primary">Volver al Catálogo</Link>
             </div>
         );
     }
 
-    const whatsappMsg = `Hola 👋 Estoy interesado en el producto *${product.name}*. ¿Podrías darme más información?`;
-    const whatsappURL = `https://wa.me/59170000000?text=${encodeURIComponent(
-        whatsappMsg
-    )}`;
+    // Breadcrumbs: Inicio > Catálogo > Category > Product
+    const crumbs = [
+        { label: "Inicio", to: "/" },
+        { label: "Catálogo", to: "/catalogo" },
+        { label: product.category || "Categoría", to: `/catalogo?cat=${encodeURIComponent(product.category || "")}` },
+        { label: product.name },
+    ];
+
+    // WhatsApp link
+    const phone = "59170000000"; // reemplaza por tu número
+    const whatsappText = `Hola 👋, quisiera información sobre el producto "${product.name}". ¿Me puedes ayudar?`;
+    const whatsappHref = `https://wa.me/${phone}?text=${encodeURIComponent(whatsappText)}`;
+
+    // Related products: mismos category, excluyendo el actual
+    const related = mockProducts.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
 
     return (
-        <section className="container mx-auto py-16 px-4 grid md:grid-cols-2 gap-8">
-            <div>
-                <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="rounded-2xl shadow-md"
-                />
+        <main className="container mx-auto px-4 py-10">
+            <Breadcrumbs items={crumbs} />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* LEFT: Gallery */}
+                <div>
+                    <ImageGallery images={product.images || []} altPrefix={product.name} video={product.video} />
+                </div>
+
+                {/* RIGHT: Info */}
+                <div>
+                    <h1 className="font-heading font-extrabold text-2xl md:text-3xl text-text mb-3">{product.name}</h1>
+                    {product.short && <h2 className="text-md text-text-light mb-4 font-body">{product.short}</h2>}
+
+                    {/* Price */}
+                    <div className="mb-4">
+                        {product.price ? (
+                            <p className="text-2xl md:text-3xl font-heading text-text font-bold">Bs {product.price.toFixed(2)}</p>
+                        ) : (
+                            <p className="text-lg font-heading text-text">Consultar por WhatsApp</p>
+                        )}
+                    </div>
+
+                    {/* Highlights */}
+                    {product.highlights?.length ? (
+                        <ul className="space-y-2 mb-4">
+                            {product.highlights.map((h, i) => (
+                                <li key={i} className="flex items-start gap-3">
+                                    <span className="text-brand mt-1">•</span>
+                                    <span className="text-sm text-text-light">{h}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        // fallback: use some fields
+                        <ul className="space-y-2 mb-4">
+                            {product.material && <li className="flex items-start gap-3"><span className="text-brand mt-1">•</span><span className="text-sm text-text-light">Material: {product.material}</span></li>}
+                            {product.size && <li className="flex items-start gap-3"><span className="text-brand mt-1">•</span><span className="text-sm text-text-light">Tamaño: {product.size}</span></li>}
+                            {product.petTypes && <li className="flex items-start gap-3"><span className="text-brand mt-1">•</span><span className="text-sm text-text-light">Para: {product.petTypes.join(", ")}</span></li>}
+                        </ul>
+                    )}
+
+                    {/* Detailed description */}
+                    <div className="mb-6">
+                        <h3 className="font-heading text-lg mb-2">Descripción</h3>
+                        <p className="text-text-light text-sm">{product.description}</p>
+                    </div>
+
+                    {/* Specs */}
+                    <div className="mb-6">
+                        <h3 className="font-heading text-lg mb-2">Especificaciones</h3>
+
+                        <table className="w-full text-sm text-text-light">
+                            <tbody>
+                                {product.dimensions && (
+                                    <tr>
+                                        <td className="py-2 font-medium">Dimensiones</td>
+                                        <td className="py-2 text-right">{product.dimensions}</td>
+                                    </tr>
+                                )}
+                                {product.material && (
+                                    <tr>
+                                        <td className="py-2 font-medium">Materiales</td>
+                                        <td className="py-2 text-right">{product.material}</td>
+                                    </tr>
+                                )}
+                                {product.weightCapacity && (
+                                    <tr>
+                                        <td className="py-2 font-medium">Peso soportado</td>
+                                        <td className="py-2 text-right">{product.weightCapacity}</td>
+                                    </tr>
+                                )}
+                                {product.colors && (
+                                    <tr>
+                                        <td className="py-2 font-medium">Colores</td>
+                                        <td className="py-2 text-right">{product.colors.join(", ")}</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Questions & CTA */}
+                    <div className="mb-6">
+                        <p className="text-text-light mb-3">¿Dudas con el tamaño o envío?</p>
+                        <a
+                            href={whatsappHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white px-5 py-3 rounded-lg font-heading font-semibold"
+                            aria-label="Consultar por WhatsApp"
+                        >
+                            <FaWhatsapp className="w-5 h-5" /> ¡Consultar por WhatsApp Ahora!
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <div className="flex flex-col justify-center">
-                <h1 className="text-4xl font-heading text-brand mb-4">
-                    {product.name}
-                </h1>
-                <p className="text-gray-600 mb-4">{product.description}</p>
-                <p className="text-2xl font-bold text-gray-800 mb-6">
-                    Bs {product.price.toFixed(2)}
-                </p>
-                <a
-                    href={whatsappURL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-brand hover:bg-brand-dark text-white px-6 py-3 rounded-lg shadow-lg transition"
-                >
-                    Consultar por WhatsApp
-                </a>
-            </div>
-        </section>
+            {/* Related */}
+            <RelatedProducts products={related} />
+        </main>
     );
 }
-
-export default Product;

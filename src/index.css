@@ -1,23 +1,127 @@
+/* =========================================
+   🧱 BASE DE TAILWIND
+========================================= */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos globales */
+/* =========================================
+   🌍 ESTILOS GLOBALES
+========================================= */
 body {
   @apply font-body bg-gray-50 text-gray-800;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   @apply font-heading text-brand-dark;
 }
-/* Animación pulse lenta y respetuosa con preferencias de motion */
+
+h1 {
+  @apply text-white;
+  /* sobrescribe para Hero */
+}
+
+section {
+  scroll-margin-top: 65px;
+  /* evita que el header fijo tape contenido */
+}
+
+/* =========================================
+   🎨 COMPONENTES REUTILIZABLES
+========================================= */
+
+/* Botones genéricos */
+.btn {
+  @apply inline-flex items-center justify-center px-5 py-3 rounded-lg font-heading font-medium transition duration-200;
+}
+
+.btn-primary {
+  @apply bg-brand text-white hover:bg-brand-dark;
+}
+
+.btn-outline-green {
+  @apply border border-brand text-brand px-4 py-2 rounded-md inline-flex items-center gap-2 hover:bg-brand/5 transition;
+}
+
+/* Etiquetas destacadas tipo "pill" */
+.badge-pill {
+  @apply absolute top-3 right-3 bg-brand text-white text-xs font-semibold px-3 py-1 rounded-full shadow;
+}
+
+/* Iconos dentro de círculos */
+.icon-circle {
+  @apply w-14 h-14 flex items-center justify-center rounded-full bg-brand-light text-brand mb-4;
+}
+
+/* =========================================
+   🦴 HERO SECTION
+========================================= */
+#hero {
+  background-attachment: fixed;
+}
+
+/* Capa oscura encima del fondo */
+.hero-overlay {
+  background: linear-gradient(90deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.45) 50%,
+      rgba(0, 0, 0, 0.55) 100%);
+  transition: background-position 2s ease;
+  background-size: 200% 200%;
+}
+
+/* Degradado inferior para transición suave */
+.hero-overlay::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(180deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(255, 255, 255, 1) 100%);
+}
+
+/* Efecto elegante al pasar el mouse sobre el Hero */
+section#hero:hover .hero-overlay {
+  background-position: right center;
+}
+
+/* =========================================
+   💫 ANIMACIONES
+========================================= */
+
+/* Pulse lento (respetuoso con accesibilidad) */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes pulse-slow {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.06); }
-    100% { transform: scale(1); }
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.06);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
+
   .animate-pulse-slow {
     animation: pulse-slow 2.8s ease-in-out infinite;
   }
+}
+
+/* =========================================
+   🧩 OTROS
+========================================= */
+
+h1 {
+  @apply font-heading font-extrabold;
 }

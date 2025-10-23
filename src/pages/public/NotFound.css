@@ -1,0 +1,54 @@
+/* NOTA: Usamos los nombres de clase originales del HTML: block404, waves, t404, obj */
+
+/* Contenedor principal */
+.block404 {
+    position: relative;
+    background-image: url(https://imgur.com/eHVyWTM.jpg);
+    /* ELIMINADOS: width: 1248px; y height: 620px; */
+    overflow: hidden;
+    cursor: pointer;
+    /* Tailwind maneja ahora w-screen y h-screen */
+}
+
+/* Las ondas con el filtro glitch */
+.waves {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url(https://imgur.com/eHVyWTM.jpg);
+    filter: url("#glitch");
+}
+
+/* El texto '404' (imagen) */
+.t404 {
+    position: absolute;
+    width: 364px;
+    height: 146px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-image: url(https://imgur.com/KPZo9YX.png);
+}
+
+/* El objeto animado */
+.obj {
+    width: 204px;
+    height: 209px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    animation: animation-404 6s infinite ease-in-out;
+}
+
+/* Definición de la animación de movimiento */
+@keyframes animation-404 {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) rotate(0);
+    }
+
+    50% {
+        transform: translate(-53%, -42%) rotate(-5deg);
+    }
+}

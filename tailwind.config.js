@@ -7,28 +7,22 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        base: "#FFFFFF",        // Fondo principal
-        soft: "#F0F0F0",        // Fondo secundario / contraste suave
+        base: "#FFFFFF",
+        soft: "#F0F0F0",
         text: {
-          DEFAULT: "#333333",   // Texto principal
-          light: "#808080",     // Texto secundario / detalles
+          DEFAULT: "#333333",
+          light: "#808080",
         },
         brand: {
-          DEFAULT: "#4CAF50",   // Verde principal (acento)
-          dark: "#2E7D32",      // Verde oscuro
-          light: "#A5D6A7",     // Verde claro
+          DEFAULT: "#4CAF50",   // <-- aquí debe estar el verde
+          dark: "#2E7D32",
+          light: "#A5D6A7",
         },
-        danger: "#FF0000",      // Rojo (alertas o errores)
+        danger: "#FF0000",
       },
       fontFamily: {
         heading: ["Montserrat", "sans-serif"],
         body: ["Lato", "sans-serif"],
-      },
-      boxShadow: {
-        soft: "0 2px 8px rgba(0, 0, 0, 0.08)", // sombras suaves y limpias
-      },
-      borderRadius: {
-        xl: "1rem",
       },
     },
   },
