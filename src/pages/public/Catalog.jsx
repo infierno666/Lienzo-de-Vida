@@ -1,18 +1,33 @@
-// src/pages/Catalog.jsx
 import { useMemo, useState } from "react";
 import { mockProducts } from "../../data/mockData";
 import ProductCard from "../../components/products/ProductCard";
-import FilterSidebar from "../../components/FilterSidebar";
+import FilterSidebar from "../../components/FilterSidebar"; // Componente externo
 import SortDropdown from "../../components/SortDropdown";
 import Pagination from "../../components/Pagination";
+import { Filter, X, LayoutGrid } from "lucide-react"; // Iconos para mejor estética
+
+// Se mantiene la lógica de cálculo de conteos fuera del componente principal
+function computeCounts(products) {
+    const counts = { categories: {}, petTypes: {}, sizes: {}, materials: {} };
+
+    products.forEach((p) => {
+        if (p.category) counts.categories[p.category] = (counts.categories[p.category] || 0) + 1;
+        const pts = Array.isArray(p.petTypes) ? p.petTypes : p.tags || [];
+        pts.forEach((t) => (counts.petTypes[t] = (counts.petTypes[t] || 0) + 1));
+        if (p.size) counts.sizes[p.size] = (counts.sizes[p.size] || 0) + 1;
+        if (p.material) counts.materials[p.material] = (counts.materials[p.material] || 0) + 1;
+    });
+
+    return counts;
+}
 
 export default function Catalog() {
     // Estado filtros
     const [filters, setFilters] = useState({
-        categories: [],    // multiple
-        petTypes: [],      // Canes, Felinos
-        sizes: [],         // Pequeño, Mediano, Grande
-        materials: [],     // Madera, Tela, Plastico
+        categories: [], 	// multiple
+        petTypes: [], 	// Canes, Felinos
+        sizes: [], 		// Pequeño, Mediano, Grande
+        materials: [], 	// Madera, Tela, Plastico
     });
 
     const [sortBy, setSortBy] = useState("novedad"); // "novedad" | "price-asc" | "price-desc" | "alpha"
@@ -22,7 +37,8 @@ export default function Catalog() {
     // Mobile: mostrar/ocultar sidebar
     const [showFiltersMobile, setShowFiltersMobile] = useState(false);
 
-    // Extrae listas únicas para mostrar en el sidebar (a partir de mockProducts)
+
+    // Extrae listas únicas para mostrar en el sidebar
     const allCategories = useMemo(
         () => Array.from(new Set(mockProducts.map((p) => p.category).filter(Boolean))),
         []
@@ -53,7 +69,10 @@ export default function Catalog() {
         []
     );
 
-    // Filtrado principal (tolerante si campos faltan)
+    const productCounts = useMemo(() => computeCounts(mockProducts), []);
+
+
+    // Filtrado principal
     const filtered = useMemo(() => {
         let items = [...mockProducts];
 
@@ -101,11 +120,15 @@ export default function Catalog() {
     }, [filters, sortBy]);
 
     // pagination
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-    // if current page > totalPages, reset to 1
+    const totalResults = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
     if (page > totalPages) setPage(1);
     const start = (page - 1) * pageSize;
     const pagedItems = filtered.slice(start, start + pageSize);
+    const showingStart = Math.min(totalResults, start + 1);
+    const showingEnd = Math.min(totalResults, start + pageSize);
+    const totalActiveFilters = Object.values(filters).reduce((acc, arr) => acc + arr.length, 0);
+
 
     // handlers for filter changes
     const toggleArrayValue = (key, value) => {
@@ -131,29 +154,25 @@ export default function Catalog() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <header className="mb-6">
-                <h1 className="text-2xl md:text-3xl font-heading text-text">Nuestro Catálogo Completo</h1>
+        <main className="max-w-7xl mx-auto px-6 py-16">
+
+            {/* ENCABEZADO Y TÍTULO MEJORADO */}
+            <header className="mb-10 border-b border-gray-200 pb-6">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-text tracking-tight">
+                    Catálogo de Productos
+                </h1>
+                <p className="text-lg text-text-light mt-1">
+                    Explora nuestra colección y encuentra el producto perfecto para tu mascota.
+                </p>
             </header>
 
-            <div className="flex flex-col lg:flex-row gap-6">
-                {/* SIDEBAR - Mobile toggle */}
-                <div className="lg:w-1/4">
-                    <div className="flex items-center justify-between mb-4 lg:hidden">
-                        <h3 className="font-heading">Filtrar por</h3>
-                        <button
-                            onClick={() => setShowFiltersMobile((s) => !s)}
-                            className="text-sm px-3 py-2 border rounded-md"
-                            aria-expanded={showFiltersMobile}
-                        >
-                            {showFiltersMobile ? "Cerrar" : "Abrir filtros"}
-                        </button>
-                    </div>
+            <div className="flex flex-col lg:flex-row gap-8"> {/* Aumento de gap */}
 
-                    {/* Desktop always visible, mobile toggled */}
-                    <div className={`lg:block ${showFiltersMobile ? "block" : "hidden"}`}>
+                {/* SIDEBAR - Desktop View */}
+                <aside className="hidden lg:block lg:w-1/4">
+                    <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-md sticky top-6">
                         <FilterSidebar
-                            categoriesWithCounts={computeCounts(mockProducts)}
+                            counts={productCounts}
                             categories={allCategories}
                             petTypes={allPetTypes}
                             sizes={allSizes}
@@ -167,59 +186,114 @@ export default function Catalog() {
                             onClear={clearFilters}
                         />
                     </div>
-                </div>
+                </aside>
 
                 {/* PRODUCTS AREA */}
                 <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                        <div>
-                            <p className="text-sm text-text-light">
-                                Mostrando <span className="font-semibold">{filtered.length}</span> productos
-                            </p>
+
+                    {/* BARRA SUPERIOR DE CONTROLES (Móvil y Desktop) */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+
+                        {/* Botón de Filtros Móviles (Ajuste estético) */}
+                        <div className="lg:hidden flex justify-between items-center w-full">
+                            <button
+                                onClick={() => setShowFiltersMobile(true)}
+                                className="bg-brand text-white px-5 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-xl hover:bg-brand-dark transition duration-300 inline-flex items-center gap-2 flex-grow sm:flex-grow-0"
+                            >
+                                <Filter className="w-5 h-5" />
+                                {totalActiveFilters > 0 ? `Filtros Activos (${totalActiveFilters})` : "Abrir Filtros"}
+                            </button>
+                            {/* Ordenar (en móvil) */}
+                            <div className="flex items-center gap-3">
+                                <label htmlFor="sort-dropdown-mobile" className="text-sm text-text-light font-medium whitespace-nowrap hidden sm:block">Ordenar:</label>
+                                <SortDropdown
+                                    id="sort-dropdown-mobile"
+                                    value={sortBy}
+                                    onChange={(v) => {
+                                        setSortBy(v);
+                                        setPage(1);
+                                    }}
+                                />
+                            </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <label className="text-sm text-text-light">Ordenar:</label>
+                        {/* Indicador de Resultados (Mejora estética) */}
+                        <div className="hidden lg:block">
+                            <div className="inline-flex items-center gap-2 text-text-light text-base">
+                                <LayoutGrid className="w-4 h-4 text-brand" />
+                                {totalResults === 0 ? (
+                                    <span className="font-semibold text-text">0 resultados</span>
+                                ) : (
+                                    <span className="font-medium">
+                                        Mostrando <span className="font-semibold text-text">{showingStart}-{showingEnd}</span> de <span className="font-semibold text-text">{totalResults}</span> productos
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Ordenar (en desktop) */}
+                        <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
+                            <label className="text-sm text-text-light font-medium whitespace-nowrap">Ordenar por:</label>
                             <SortDropdown value={sortBy} onChange={(v) => { setSortBy(v); setPage(1); }} />
                         </div>
                     </div>
 
                     {/* Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {pagedItems.map((p) => <ProductCard key={p.id} product={p} />)}
-                    </div>
+                    {totalResults > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"> {/* Ajuste de grid */}
+                            {pagedItems.map((p) => <ProductCard key={p.id} product={p} />)}
+                        </div>
+                    ) : (
+                        <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                            <h3 className="text-2xl font-bold text-text mb-4">¡Ups! No encontramos coincidencias.</h3>
+                            <p className="text-text-light mb-6">
+                                Intenta limpiar o ajustar tus filtros.
+                            </p>
+                            {totalActiveFilters > 0 && (
+                                <button onClick={clearFilters} className="bg-brand text-white px-8 py-3 rounded-xl font-semibold hover:bg-brand-dark transition duration-300 shadow-md">
+                                    Limpiar {totalActiveFilters} Filtros
+                                </button>
+                            )}
+                        </div>
+                    )}
 
                     {/* Pagination */}
-                    <div className="mt-8">
-                        <Pagination current={page} total={totalPages} onChange={setPage} />
-                    </div>
+                    {totalPages > 1 && (
+                        <div className="mt-12 flex justify-center">
+                            <Pagination current={page} total={totalPages} onChange={setPage} />
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>
+
+            {/* MODAL DE FILTROS MÓVILES (Full-screen overlay) */}
+            {showFiltersMobile && (
+                <div className="fixed inset-0 z-50 bg-white/95 backdrop-blur-sm lg:hidden transition-opacity duration-300 overflow-y-auto">
+                    <div className="p-6 h-full">
+                        <div className="flex justify-between items-center border-b pb-4 mb-6 sticky top-0 bg-white z-10">
+                            <h3 className="text-2xl font-bold text-text">Refinar Búsqueda</h3>
+                            <button onClick={() => setShowFiltersMobile(false)} className="text-text hover:text-brand p-1 rounded-full hover:bg-gray-100 transition">
+                                <X className="w-7 h-7" />
+                            </button>
+                        </div>
+                        <FilterSidebar
+                            counts={productCounts}
+                            categories={allCategories}
+                            petTypes={allPetTypes}
+                            sizes={allSizes}
+                            materials={allMaterials}
+                            activeFilters={filters}
+                            onToggleCategory={(cat) => toggleArrayValue("categories", cat)}
+                            onTogglePetType={(pt) => toggleArrayValue("petTypes", pt)}
+                            onToggleSize={(sz) => toggleArrayValue("sizes", sz)}
+                            onToggleMaterial={(m) => toggleArrayValue("materials", m)}
+                            onApply={applyFilters} // Aplica y cierra el modal
+                            onClear={clearFilters}
+                            isMobile={true} // Se asume que el FilterSidebar maneja el estilo del botón Apply/Clear internamente para móvil.
+                        />
+                    </div>
+                </div>
+            )}
+        </main>
     );
-}
-
-/**
- * computeCounts(products) -> returns object with counts per category, petType, size, material
- * useful to show counters in the sidebar without re-scanning all the time.
- */
-function computeCounts(products) {
-    const counts = {
-        categories: {},
-        petTypes: {},
-        sizes: {},
-        materials: {},
-    };
-
-    products.forEach((p) => {
-        if (p.category) counts.categories[p.category] = (counts.categories[p.category] || 0) + 1;
-
-        const pts = Array.isArray(p.petTypes) ? p.petTypes : p.tags || [];
-        pts.forEach((t) => (counts.petTypes[t] = (counts.petTypes[t] || 0) + 1));
-
-        if (p.size) counts.sizes[p.size] = (counts.sizes[p.size] || 0) + 1;
-        if (p.material) counts.materials[p.material] = (counts.materials[p.material] || 0) + 1;
-    });
-
-    return counts;
 }
