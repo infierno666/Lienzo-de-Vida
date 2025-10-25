@@ -13,19 +13,20 @@ export default function RelatedProducts({ products = [] }) {
                     Completa tu pedido: Productos Similares
                 </h3>
 
+                {/* Carrusel en móvil / Grid o centrado en desktop */}
                 <div
-                    className={`${ 
-                        shouldCenter
-                            ? "flex justify-center gap-6 md:gap-8 flex-wrap"
-                            : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8"
-                    }`}
+                    className={`${shouldCenter
+                            ? "md:flex md:justify-center md:flex-wrap md:gap-8"
+                            : "md:grid md:grid-cols-4 md:gap-8"
+                        } 
+                    flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide`}
                 >
                     {products.map((p) => (
                         <div
                             key={p.id}
-                            className="flex justify-center"
+                            className="flex justify-center flex-shrink-0 snap-center"
                             style={{
-                                width: "16rem", // = w-64 (tamaño fijo original)
+                                width: "16rem", // mantiene el tamaño original (w-64)
                             }}
                         >
                             <ProductCard product={p} />
