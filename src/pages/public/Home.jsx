@@ -251,8 +251,6 @@ export default function Home() {
                 </div>
             </motion.section>
 
-            {/* testimonios */}
-            <Testimonials items={testimonials} />
 
             {/* --- CTA general (Mantenemos la mejora anterior con corrección de shadow) --- */}
             <section className="py-32 bg-soft">

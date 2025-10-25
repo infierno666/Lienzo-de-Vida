@@ -3,9 +3,8 @@ import './NotFound.css'; // Importa el CSS con animaciones
 
 const NotFound = () => {
     return (
-        // CAMBIO: Añadimos 'w-screen h-screen' para que ocupe todo el viewport
-        // Eliminamos 'w-[1248px] h-[620px]' y 'mx-auto my-8'
-        <div className="block404 w-screen h-screen relative overflow-hidden cursor-pointer">
+        
+        <div className="block404 w-full h-screen relative overflow-hidden cursor-pointer">
 
             {/* Las ondas */}
             <div className="waves"></div>
