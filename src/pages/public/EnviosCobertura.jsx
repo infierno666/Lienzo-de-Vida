@@ -70,7 +70,7 @@ export default function EnviosCobertura() {
             {/* 🏞️ MAPA CENTRADO Y RESPONSIVE (z-50, no bloquea clics) */}
             <div className=" absolute  inset-0 z-50  flex justify-center top-44 items-start pt-8 sm:pt-16 pointer-events-none">
                 <img
-                    src="src/assets/MapaBolivia.png"
+                    src="../../MapaBolivia.png"
                     alt="Mapa de Bolivia"
                     className="w-full max-w-sm sm:max-w-lg object-contain opacity-0 sm:opacity-30 transition-opacity duration-500"
                     style={{ opacity: 0.5 }}
