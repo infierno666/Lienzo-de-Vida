@@ -28,14 +28,14 @@ const CONTACT_INFO = [
         icon: FaWhatsapp,
         title: "Línea Directa",
         value: "+591 700 00000",
-        href: "https://wa.me/59170000000?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20productos.",
+        href: "https://wa.me/59170049343?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20productos.",
         target: "_blank"
     },
     {
         icon: FaEnvelope,
         title: "Correo Electrónico",
-        value: "contacto@lienzodevida.com",
-        href: "mailto:contacto@lienzodevida.com"
+        value: "jhimyalvaromaldonado@gmail.com",
+        href: "mailto:jhimyalvaromaldonado@gmail.com"
     },
     {
         icon: FaMapMarkerAlt,

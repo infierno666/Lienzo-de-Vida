@@ -188,7 +188,7 @@ export default function EnviosCobertura() {
                             ¿Necesitas una cotización de envío personalizada?
                         </p>
                         <motion.a
-                            href="https://wa.me/59170000000?text=Hola%2C%20quisiera%20consultar%20sobre%20envíos%20y%20zonas%20de%20cobertura."
+                            href="https://wa.me/59170049343?text=Hola%2C%20quisiera%20consultar%20sobre%20envíos%20y%20zonas%20de%20cobertura."
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-heading font-bold px-6 py-3 sm:px-8 sm:py-4 rounded-full transition shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"

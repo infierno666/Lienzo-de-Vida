@@ -294,7 +294,7 @@ export default function Nosotros() {
 
                         {/* Botón 2: Botón de borde, texto de marca (brand) y fondo blanco/transparente */}
                         <a
-                            href={`https://wa.me/59170000000?text=${encodeURIComponent(
+                            href={`https://wa.me/59170049343?text=${encodeURIComponent(
                                 "Hola! Me gustaría conversar con Lienzo de Vida sobre un diseño personalizado o consulta general."
                             )}`}
                             className="btn inline-flex items-center gap-3 border-2 border-brand text-brand hover:bg-brand hover:text-white px-8 py-3 text-lg font-semibold transition duration-300"
