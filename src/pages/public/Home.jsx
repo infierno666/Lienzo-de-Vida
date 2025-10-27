@@ -47,7 +47,7 @@ export default function Home() {
     }, []); // El array vacío asegura que se ejecuta solo una vez al montar
 
 
-    const heroImage = "../hero.webp";
+    const heroImage = "../../hero.webp";
 
     // Framer Motion variants
     const container = {
@@ -279,8 +279,7 @@ export default function Home() {
                 </div>
             </motion.section>
 
-            {/* Secciones de Testimonios y CTA final */}
-            <Testimonials testimonials={testimonials} />
+
 
             {/* --- CTA general --- */}
             <section className="py-32 bg-soft">
