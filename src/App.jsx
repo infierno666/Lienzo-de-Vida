@@ -1,5 +1,6 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom"; // Importamos 'Outlet' si no lo estás usando
+// No necesitamos importar 'Outlet' aquí, solo en los Layouts/Guards que lo usan.
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop"; // 💡 Nuevo componente para el scroll
 
 import AppLayout from "./layouts/AppLayout";
@@ -14,7 +15,6 @@ import EnviosCobertura from "./pages/public/EnviosCobertura";
 import NotFound from "./pages/public/NotFound";
 
 // Legal pages
-// NOTA: Revisa que la carpeta 'LEGAL' tenga el mismo case en tu disco duro para evitar errores en producción
 import PoliticaPrivacidad from "./pages/public/LEGAL/PoliticaPrivacidad";
 import TerminosServicio from "./pages/public/LEGAL/TerminosServicio";
 import FAQ from "./pages/public/LEGAL/FAQ";
@@ -37,37 +37,32 @@ function App() {
 
       <Routes>
 
-        {/* ======================================================= */}
-        {/* --- 2. ÁREA ADMIN (PROTEGIDA) --- */}
-        {/* Usamos AuthGuard para proteger todas las subrutas del admin */}
-        {/* ======================================================= */}
-
-        {/* Ruta pública de Login */}
+        {/* 1. Ruta pública de Login */}
         <Route path="/admin/login" element={<Login />} />
 
-        {/* Ruta protectora: Si AuthGuard aprueba, permite la renderización de las rutas anidadas.
-          El AuthGuard debería retornar <Outlet /> si el usuario es admin, o <Navigate to="/admin/login" /> si no lo es.
-        */}
-        <Route element={<AuthGuard />}>
-          {/* AdminLayout es el contenedor de todas las páginas internas del admin */}
-          <Route path="/admin" element={<AdminLayout />}>
+        {/* 🚨 2. ÁREA ADMIN (PROTEGIDA) - CORRECCIÓN CLAVE 🚨 */}
+        {/* Usamos AuthGuard para proteger todas las rutas anidadas. */}
+        <Route path="/admin" element={<AuthGuard />}>
 
-            {/* Rutas anidadas del Admin: Todas protegidas y con el AdminLayout */}
+          {/* Dentro del AuthGuard, definimos el AdminLayout. 
+              Todas las rutas anidadas (children) se renderizarán dentro de su <Outlet />. */}
+          <Route element={<AdminLayout />}>
+            {/* Ruta Index: /admin */}
             <Route index element={<Dashboard />} />
+
+            {/* Rutas anidadas de administración */}
             <Route path="productos" element={<ProductsList />} />
             <Route path="productos/nuevo" element={<ProductFormPage />} />
             <Route path="productos/editar/:id" element={<ProductFormPage />} />
             <Route path="medios" element={<MediaLibrary />} />
 
-            {/* Si un usuario admin accede a /admin/ruta-no-existente, le mostramos el 404 del Admin si lo tuvieras,
-                sino, lo enviamos al Dashboard */}
+            {/* Cualquier otra ruta que no haga match dentro de /admin */}
             <Route path="*" element={<Dashboard />} />
-
           </Route>
         </Route>
 
         {/* ======================================================= */}
-        {/* --- 3. ÁREA PÚBLICA --- */}
+        {/* --- 3. ÁREA PÚBLICA (Correcta) --- */}
         {/* ======================================================= */}
 
         <Route path="/" element={<AppLayout />}>
@@ -85,14 +80,11 @@ function App() {
           <Route path="devoluciones" element={<Devoluciones />} />
 
           {/* --- 404 para rutas públicas (va al final) --- */}
-          {/* Si ninguna de las rutas anteriores hizo match, usamos la última: */}
           <Route path="*" element={<NotFound />} />
         </Route>
 
-        {/* 4. Captura final de rutas que NO USAN AppLayout (e.g. rutas mal escritas que no son /admin/*) */}
-        {/* Esto es solo por si acaso */}
-        <Route path="*" element={<NotFound />} />
-
+        {/* Esta última ruta de NotFound ya no es estrictamente necesaria si la anidada captura todos los casos */}
+        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </BrowserRouter>
   );

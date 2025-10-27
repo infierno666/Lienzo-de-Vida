@@ -1,12 +1,12 @@
-import { useMemo, useState } from "react";
-import { mockProducts } from "../../data/mockData";
+import { useMemo, useState, useEffect } from "react";
 import ProductCard from "../../components/products/ProductCard";
-import FilterSidebar from "../../components/FilterSidebar"; // Componente externo
+import FilterSidebar from "../../components/FilterSidebar";
 import SortDropdown from "../../components/SortDropdown";
 import Pagination from "../../components/Pagination";
-import { Filter, X, LayoutGrid } from "lucide-react"; // Iconos para mejor estética
+import { Filter, X, LayoutGrid } from "lucide-react";
+import { getAllProducts } from "../../api/productService";
 
-// Se mantiene la lógica de cálculo de conteos fuera del componente principal
+// Calcula counts de filtros dinámicamente
 function computeCounts(products) {
     const counts = { categories: {}, petTypes: {}, sizes: {}, materials: {} };
 
@@ -22,104 +22,70 @@ function computeCounts(products) {
 }
 
 export default function Catalog() {
-    // Estado filtros
+    // Estados
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     const [filters, setFilters] = useState({
-        categories: [], 	// multiple
-        petTypes: [], 	// Canes, Felinos
-        sizes: [], 		// Pequeño, Mediano, Grande
-        materials: [], 	// Madera, Tela, Plastico
+        categories: [],
+        petTypes: [],
+        sizes: [],
+        materials: [],
     });
 
-    const [sortBy, setSortBy] = useState("novedad"); // "novedad" | "price-asc" | "price-desc" | "alpha"
+    const [sortBy, setSortBy] = useState("novedad");
     const [page, setPage] = useState(1);
     const pageSize = 9;
-
-    // Mobile: mostrar/ocultar sidebar
     const [showFiltersMobile, setShowFiltersMobile] = useState(false);
 
+    // 🔹 Fetch productos reales desde backend
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const res = await getAllProducts();
+                setProducts(res.products || []); // Ajusta según tu respuesta de API
+            } catch (err) {
+                console.error(err);
+                setError("Error al cargar productos.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
 
-    // Extrae listas únicas para mostrar en el sidebar
-    const allCategories = useMemo(
-        () => Array.from(new Set(mockProducts.map((p) => p.category).filter(Boolean))),
-        []
-    );
-    const allPetTypes = useMemo(
-        () =>
-            Array.from(
-                new Set(
-                    mockProducts.flatMap((p) => (Array.isArray(p.petTypes) ? p.petTypes : p.tags || [])).filter(Boolean)
-                )
-            ),
-        []
-    );
-    const allSizes = useMemo(
-        () =>
-            Array.from(
-                new Set(
-                    mockProducts.map((p) => p.size).filter(Boolean)
-                )
-            ),
-        []
-    );
-    const allMaterials = useMemo(
-        () =>
-            Array.from(
-                new Set(mockProducts.map((p) => p.material).filter(Boolean))
-            ),
-        []
-    );
+    // 🔹 Listas únicas y counts para filtros
+    const allCategories = useMemo(() => Array.from(new Set(products.map((p) => p.category).filter(Boolean))), [products]);
+    const allPetTypes = useMemo(() => Array.from(new Set(products.flatMap((p) => (Array.isArray(p.petTypes) ? p.petTypes : p.tags || [])).filter(Boolean))), [products]);
+    const allSizes = useMemo(() => Array.from(new Set(products.map((p) => p.size).filter(Boolean))), [products]);
+    const allMaterials = useMemo(() => Array.from(new Set(products.map((p) => p.material).filter(Boolean))), [products]);
+    const productCounts = useMemo(() => computeCounts(products), [products]);
 
-    const productCounts = useMemo(() => computeCounts(mockProducts), []);
-
-
-    // Filtrado principal
+    // 🔹 Filtrado y sorting
     const filtered = useMemo(() => {
-        let items = [...mockProducts];
+        let items = [...products];
 
-        // categories (multiple)
-        if (filters.categories.length) {
-            items = items.filter((p) => filters.categories.includes(p.category));
-        }
+        if (filters.categories.length) items = items.filter((p) => filters.categories.includes(p.category));
+        if (filters.petTypes.length) items = items.filter((p) => {
+            const pts = Array.isArray(p.petTypes) ? p.petTypes : p.tags || [];
+            return pts.some((pt) => filters.petTypes.includes(pt));
+        });
+        if (filters.sizes.length) items = items.filter((p) => filters.sizes.includes(p.size));
+        if (filters.materials.length) items = items.filter((p) => p.material && filters.materials.includes(p.material));
 
-        // petTypes (multiple) - product may have petTypes array or tags array
-        if (filters.petTypes.length) {
-            items = items.filter((p) => {
-                const pts = Array.isArray(p.petTypes) ? p.petTypes : p.tags || [];
-                return pts.some((pt) => filters.petTypes.includes(pt));
-            });
-        }
-
-        // sizes
-        if (filters.sizes.length) {
-            items = items.filter((p) => filters.sizes.includes(p.size));
-        }
-
-        // materials
-        if (filters.materials.length) {
-            items = items.filter((p) => p.material && filters.materials.includes(p.material));
-        }
-
-        // sorting
         switch (sortBy) {
-            case "price-asc":
-                items.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-                break;
-            case "price-desc":
-                items.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-                break;
-            case "alpha":
-                items.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
-                break;
-            case "novedad":
-            default:
-                // keep original order (assume mockProducts already newest first)
-                break;
+            case "price-asc": items.sort((a, b) => (a.price ?? 0) - (b.price ?? 0)); break;
+            case "price-desc": items.sort((a, b) => (b.price ?? 0) - (a.price ?? 0)); break;
+            case "alpha": items.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")); break;
+            default: break; // novedad = mantener orden original
         }
 
         return items;
-    }, [filters, sortBy]);
+    }, [filters, sortBy, products]);
 
-    // pagination
+    // 🔹 Paginación
     const totalResults = filtered.length;
     const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
     if (page > totalPages) setPage(1);
@@ -129,46 +95,31 @@ export default function Catalog() {
     const showingEnd = Math.min(totalResults, start + pageSize);
     const totalActiveFilters = Object.values(filters).reduce((acc, arr) => acc + arr.length, 0);
 
-
-    // handlers for filter changes
+    // 🔹 Handlers
     const toggleArrayValue = (key, value) => {
         setFilters((prev) => {
             const arr = prev[key] || [];
             const exists = arr.includes(value);
-            return {
-                ...prev,
-                [key]: exists ? arr.filter((x) => x !== value) : [...arr, value],
-            };
+            return { ...prev, [key]: exists ? arr.filter((x) => x !== value) : [...arr, value] };
         });
         setPage(1);
     };
+    const applyFilters = () => { setShowFiltersMobile(false); setPage(1); };
+    const clearFilters = () => { setFilters({ categories: [], petTypes: [], sizes: [], materials: [] }); setPage(1); };
 
-    const applyFilters = () => {
-        setShowFiltersMobile(false);
-        setPage(1);
-    };
-
-    const clearFilters = () => {
-        setFilters({ categories: [], petTypes: [], sizes: [], materials: [] });
-        setPage(1);
-    };
+    // 🔹 Render
+    if (loading) return <p className="text-center py-20">Cargando productos...</p>;
+    if (error) return <p className="text-center py-20 text-red-600">{error}</p>;
 
     return (
         <main className="max-w-7xl mx-auto px-6 py-16">
-
-            {/* ENCABEZADO Y TÍTULO MEJORADO */}
             <header className="mb-10 border-b border-gray-200 pb-6">
-                <h1 className="text-4xl md:text-5xl font-extrabold text-text tracking-tight">
-                    Catálogo de Productos
-                </h1>
-                <p className="text-lg text-text-light mt-1">
-                    Explora nuestra colección y encuentra el producto perfecto para tu mascota.
-                </p>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-text tracking-tight">Catálogo de Productos</h1>
+                <p className="text-lg text-text-light mt-1">Explora nuestra colección y encuentra el producto perfecto para tu mascota.</p>
             </header>
 
-            <div className="flex flex-col lg:flex-row gap-8"> {/* Aumento de gap */}
-
-                {/* SIDEBAR - Desktop View */}
+            <div className="flex flex-col lg:flex-row gap-8">
+                {/* SIDEBAR */}
                 <aside className="hidden lg:block lg:w-1/4">
                     <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-md sticky top-6">
                         <FilterSidebar
@@ -190,11 +141,8 @@ export default function Catalog() {
 
                 {/* PRODUCTS AREA */}
                 <div className="flex-1">
-
-                    {/* BARRA SUPERIOR DE CONTROLES (Móvil y Desktop) */}
+                    {/* Barra superior */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
-
-                        {/* Botón de Filtros Móviles (Ajuste estético) */}
                         <div className="lg:hidden flex justify-between items-center w-full">
                             <button
                                 onClick={() => setShowFiltersMobile(true)}
@@ -203,21 +151,12 @@ export default function Catalog() {
                                 <Filter className="w-5 h-5" />
                                 {totalActiveFilters > 0 ? `Filtros Activos (${totalActiveFilters})` : "Abrir Filtros"}
                             </button>
-                            {/* Ordenar (en móvil) */}
                             <div className="flex items-center gap-3">
                                 <label htmlFor="sort-dropdown-mobile" className="text-sm text-text-light font-medium whitespace-nowrap hidden sm:block">Ordenar:</label>
-                                <SortDropdown
-                                    id="sort-dropdown-mobile"
-                                    value={sortBy}
-                                    onChange={(v) => {
-                                        setSortBy(v);
-                                        setPage(1);
-                                    }}
-                                />
+                                <SortDropdown id="sort-dropdown-mobile" value={sortBy} onChange={(v) => { setSortBy(v); setPage(1); }} />
                             </div>
                         </div>
 
-                        {/* Indicador de Resultados (Mejora estética) */}
                         <div className="hidden lg:block">
                             <div className="inline-flex items-center gap-2 text-text-light text-base">
                                 <LayoutGrid className="w-4 h-4 text-brand" />
@@ -231,7 +170,6 @@ export default function Catalog() {
                             </div>
                         </div>
 
-                        {/* Ordenar (en desktop) */}
                         <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
                             <label className="text-sm text-text-light font-medium whitespace-nowrap">Ordenar por:</label>
                             <SortDropdown value={sortBy} onChange={(v) => { setSortBy(v); setPage(1); }} />
@@ -240,15 +178,13 @@ export default function Catalog() {
 
                     {/* Grid */}
                     {totalResults > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"> {/* Ajuste de grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                             {pagedItems.map((p) => <ProductCard key={p.id} product={p} />)}
                         </div>
                     ) : (
                         <div className="text-center py-20 bg-gray-50 rounded-xl border border-dashed border-gray-300">
                             <h3 className="text-2xl font-bold text-text mb-4">¡Ups! No encontramos coincidencias.</h3>
-                            <p className="text-text-light mb-6">
-                                Intenta limpiar o ajustar tus filtros.
-                            </p>
+                            <p className="text-text-light mb-6">Intenta limpiar o ajustar tus filtros.</p>
                             {totalActiveFilters > 0 && (
                                 <button onClick={clearFilters} className="bg-brand text-white px-8 py-3 rounded-xl font-semibold hover:bg-brand-dark transition duration-300 shadow-md">
                                     Limpiar {totalActiveFilters} Filtros
@@ -266,7 +202,7 @@ export default function Catalog() {
                 </div>
             </div>
 
-            {/* MODAL DE FILTROS MÓVILES (Full-screen overlay) */}
+            {/* MODAL FILTROS MÓVILES */}
             {showFiltersMobile && (
                 <div className="fixed inset-0 z-50 bg-white/95 backdrop-blur-sm lg:hidden transition-opacity duration-300 overflow-y-auto">
                     <div className="p-6 h-full">
@@ -287,9 +223,9 @@ export default function Catalog() {
                             onTogglePetType={(pt) => toggleArrayValue("petTypes", pt)}
                             onToggleSize={(sz) => toggleArrayValue("sizes", sz)}
                             onToggleMaterial={(m) => toggleArrayValue("materials", m)}
-                            onApply={applyFilters} // Aplica y cierra el modal
+                            onApply={applyFilters}
                             onClear={clearFilters}
-                            isMobile={true} // Se asume que el FilterSidebar maneja el estilo del botón Apply/Clear internamente para móvil.
+                            isMobile={true}
                         />
                     </div>
                 </div>

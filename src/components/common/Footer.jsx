@@ -15,10 +15,10 @@ export default function Footer() {
     const socialLinks = {
         whatsapp:
             "https://wa.me/59170000000?text=Quiero%20información%20sobre%20sus%20muebles%20para%20mascotas",
-        facebook: "#",
-        tiktok: "#",
+        facebook: "https://www.facebook.com/share/17Fn4hhrtA/",
+        tiktok: "https://www.tiktok.com/@lienzodevida7?_t=ZM-90qlecqg9l2&_r=1",
         instagram: "#",
-        email: "mailto:contacto@lienzodevida.com",
+        email: "mailto:jhimyalvaromaldonado@gmail.com",
     };
 
     return (
