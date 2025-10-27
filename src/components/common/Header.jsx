@@ -70,7 +70,7 @@ export default function Header() {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3" onClick={handleLinkClick}>
-                        <img src="src/assets/logo.png" alt="Lienzo de Vida" className="h-10 w-auto" />
+                        <img src="../../logo.png" alt="Lienzo de Vida" className="h-10 w-auto" />
                         <span className="font-heading text-text text-xl font-bold tracking-tight">Lienzo de Vida</span>
                     </Link>
 

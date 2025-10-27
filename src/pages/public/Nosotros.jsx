@@ -231,14 +231,14 @@ export default function Nosotros() {
                             name: "Albaro Jhimy Maldonado Condori",
                             role: "Diseñador Principal & Jefe de Producción",
                             bio: "La mente creativa y artesanal detrás de cada cama. Lidera el diseño, la calidad de materiales y la producción.",
-                            avatar: "src/assets/LV.webp",
+                            avatar: "../../LV.webp",
                         },
                         {
                             // Daniel Maldonado Céspedes (Desarrollador y Coordinador de Página)
                             name: "Daniel Maldonado Céspedes",
                             role: "Desarrollador Web & Coordinador Digital",
                             bio: "Responsable de la plataforma online, desde el desarrollo web hasta la coordinación de la presencia digital.",
-                            avatar: "src/assets/DEV.png",
+                            avatar: "../../DEV.png",
                         },
                     ].map((m, i) => (
                         <motion.article
