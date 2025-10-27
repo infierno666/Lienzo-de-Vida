@@ -41,7 +41,7 @@ const CONTACT_INFO = [
         icon: FaMapMarkerAlt,
         title: "Ubicación Principal",
         value: "Quillacollo, Cochabamba, Bolivia",
-        href: "https://www.google.com/maps?q=Quillacollo,+Cochabamba,+Bolivia",
+        href: "https://maps.app.goo.gl/nmdzHjP2ff6PGq4UA",
         target: "_blank"
     },
 ];
@@ -192,7 +192,7 @@ export default function Contacto() {
                         {/* Redes sociales */}
                         <div className="flex items-center gap-4 mt-3 pt-3 border-t">
                             <a
-                                href="https://www.tiktok.com/@lienzodevida"
+                                href="https://www.tiktok.com/@lienzodevida7?_t=ZM-90qlecqg9l2&_r=1"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-gray-500 hover:text-black text-2xl transition"
@@ -201,7 +201,7 @@ export default function Contacto() {
                                 <FaTiktok />
                             </a>
                             <a
-                                href="https://www.facebook.com/lienzodevida"
+                                href="https://www.facebook.com/share/17Fn4hhrtA/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-gray-500 hover:text-blue-600 text-2xl transition"

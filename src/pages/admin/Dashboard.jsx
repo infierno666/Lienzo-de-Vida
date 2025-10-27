@@ -1,10 +1,10 @@
-// src/pages/admin/Dashboard.jsx (Encabezados Profesionales e Íconos Optimizados)
+// src/pages/admin/Dashboard.jsx (CÓDIGO CORREGIDO)
 
 import {
-    FaBox,          // Producto Publicado: Caja para "productos físicos"
-    FaRegEdit,      // Borradores: Lápiz/Edición para "trabajo en curso"
-    FaEye,          // Visitas: Ojo para "visitas/visibilidad"
-    FaCheckCircle,  // Pedidos Completados: Círculo de verificación para "éxito"
+    FaBox,          // Producto Publicado
+    FaRegEdit,      // Borradores
+    FaEye,          // Visitas
+    FaCheckCircle,  // Pedidos Completados
     FaArrowUp,
     FaArrowDown,
     FaPlusCircle,
@@ -42,6 +42,46 @@ const categoryData = [
 // Colores de la Marca y Gráficos
 const PRIMARY_COLOR = "#3b82f6";   // blue-500
 const SECONDARY_COLOR = "#2563eb"; // blue-600
+
+
+/* --- 🚨 COMPONENTES AUXILIARES MOVIDOS ARRIBA 🚨 --- */
+
+// Tarjeta de Métrica (StatCard)
+function StatCard({ title, value, icon, trend, trendUp, color }) {
+    return (
+        <div className="bg-white shadow-lg rounded-xl p-5 flex flex-col justify-between border border-gray-100 hover:shadow-xl transition duration-300">
+            <div className="flex justify-between items-start mb-3">
+                {/* Ícono con Fondo de color para impacto */}
+                <span className={`p-3 rounded-full ${color} text-white text-xl flex-shrink-0`}>
+                    {icon}
+                </span>
+
+                {/* Tendencia */}
+                <span
+                    className={`flex items-center gap-1 text-sm font-semibold p-1.5 rounded-full ${trendUp ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}
+                >
+                    {trendUp ? <FaArrowUp className="w-3 h-3" /> : <FaArrowDown className="w-3 h-3" />}
+                    <span className="ml-0.5">{trend}</span>
+                </span>
+            </div>
+            <h3 className="text-gray-900 text-3xl font-extrabold mb-1">{value}</h3>
+            <p className="text-gray-500 text-sm">{title}</p>
+        </div>
+    );
+}
+
+// Item de Listado (Para Últimos Productos)
+function ListItem({ title, time }) {
+    return (
+        <li className="flex justify-between items-center border-b border-gray-50 pb-2">
+            <span className="font-medium text-gray-800">{title}</span>
+            <span className="text-xs text-gray-500 font-medium">{time}</span>
+        </li>
+    );
+}
+
+
+/* --- EXPORTACIÓN PRINCIPAL --- */
 
 export default function Dashboard() {
     return (
@@ -223,41 +263,5 @@ export default function Dashboard() {
                 </div>
             </section>
         </div>
-    );
-}
-
-/* --- COMPONENTES REUTILIZABLES MEJORADOS --- */
-
-// Tarjeta de Métrica (StatCard)
-function StatCard({ title, value, icon, trend, trendUp, color }) {
-    return (
-        <div className="bg-white shadow-lg rounded-xl p-5 flex flex-col justify-between border border-gray-100 hover:shadow-xl transition duration-300">
-            <div className="flex justify-between items-start mb-3">
-                {/* Ícono con Fondo de color para impacto */}
-                <span className={`p-3 rounded-full ${color} text-white text-xl flex-shrink-0`}>
-                    {icon}
-                </span>
-
-                {/* Tendencia */}
-                <span
-                    className={`flex items-center gap-1 text-sm font-semibold p-1.5 rounded-full ${trendUp ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}
-                >
-                    {trendUp ? <FaArrowUp className="w-3 h-3" /> : <FaArrowDown className="w-3 h-3" />}
-                    <span className="ml-0.5">{trend}</span>
-                </span>
-            </div>
-            <h3 className="text-gray-900 text-3xl font-extrabold mb-1">{value}</h3>
-            <p className="text-gray-500 text-sm">{title}</p>
-        </div>
-    );
-}
-
-// Item de Listado (Para Últimos Productos)
-function ListItem({ title, time }) {
-    return (
-        <li className="flex justify-between items-center border-b border-gray-50 pb-2">
-            <span className="font-medium text-gray-800">{title}</span>
-            <span className="text-xs text-gray-500 font-medium">{time}</span>
-        </li>
     );
 }

@@ -1,4 +1,4 @@
-// src/components/AuthGuard.jsx
+// src/components/AuthGuard.jsx (CORREGIDO)
 
 import React, { useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
@@ -9,22 +9,22 @@ export default function AuthGuard() {
 
     useEffect(() => {
         // 1. Obtener los dos valores necesarios
-        const logged = localStorage.getItem("isLoggedIn");
-        const role = localStorage.getItem("userRole"); // 💡 CLAVE: Obtener el rol
+        // 🚨 CAMBIO CLAVE: Usar 'admin_token' en lugar de 'isLoggedIn'
+        const token = localStorage.getItem("admin_token");
+        const role = localStorage.getItem("userRole");
 
-        // 2. Definir la condición de acceso: DEBE estar logueado Y DEBE ser 'admin'
-        const isAdmin = logged === "true" && role === "admin";
+        // 2. Definir la condición de acceso: DEBE existir el token Y DEBE ser 'admin'
+        // NOTA: La existencia del token (token !== null) equivale a estar logueado.
+        const isAdmin = !!token && role === "admin";
 
         if (isAdmin) {
-            // Si cumple ambas condiciones, el acceso es exitoso
             setIsAuthenticated(true);
         } else {
-            // Si falta alguno (no logueado, o logueado pero sin rol 'admin'), el acceso falla
             setIsAuthenticated(false);
 
-            // Opcional: Limpiar cualquier sesión incompleta para forzar un nuevo login
-            if (logged) {
-                localStorage.removeItem("isLoggedIn");
+            // Opcional: Limpiar cualquier sesión incompleta/inválida
+            if (token || role) { // Si existe el token O el rol
+                localStorage.removeItem("admin_token");
                 localStorage.removeItem("userRole");
             }
         }
@@ -32,7 +32,7 @@ export default function AuthGuard() {
     }, []);
 
     if (loading) {
-        // Muestra un loader mientras verifica la sesión (evita el "flicker")
+        // Muestra un loader mientras verifica la sesión (está bien mantenerlo)
         return <div className="text-center p-10">Verificando acceso...</div>;
     }
 
@@ -42,6 +42,5 @@ export default function AuthGuard() {
     }
 
     // Si NO está autenticado como ADMIN, redirige al login
-    // El 'replace' asegura que el historial del navegador no guarde la ruta /admin
     return <Navigate to="/admin/login" replace />;
 }

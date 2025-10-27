@@ -1,4 +1,4 @@
-// src/layouts/AdminLayout.jsx (Estructura Refinada y Ultra Fluida)
+// src/layouts/AdminLayout.jsx 
 
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -15,13 +15,15 @@ const TRANSITION_DURATION = "duration-500";
 
 // --- Función de Logout ---
 const handleLogout = (navigate) => {
-    localStorage.removeItem("isLoggedIn");
+    // 🚨 CORRECCIÓN CLAVE: Usamos 'admin_token' en lugar de 'isLoggedIn'
+    localStorage.removeItem("admin_token");
     localStorage.removeItem("userRole");
     navigate("/admin/login", { replace: true });
 };
 
 // --- Subcomponente: Contenido de la Sidebar (Reutilizable en Desktop y Móvil) ---
 function SidebarContent({ open, navigate, setOpen }) {
+    // El resto de la lógica de SidebarContent es correcto
     return (
         <>
             {/* Logo & Toggle */}
@@ -143,7 +145,7 @@ export default function AdminLayout() {
                 className={`
                     ${sidebarOpen ? "w-64" : "w-20"} 
                     bg-white shadow-lg flex-shrink-0 h-screen sticky top-0 z-30 
-                    transition-all ${TRANSITION_DURATION} ease-in-out flex flex-col border-r border-gray-100
+                    transition-all ${TRANSITION_DURATION} ease-in-out flex-col border-r border-gray-100
                     hidden lg:flex
                 `}
             >
