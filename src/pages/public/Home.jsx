@@ -46,26 +46,8 @@ export default function Home() {
         fetchProducts();
     }, []); // El array vacío asegura que se ejecuta solo una vez al montar
 
-    // -----------------------------------------------------------
-    // DATOS ESTÁTICOS (Mantenidos)
-    // -----------------------------------------------------------
-    // NOTA: Se eliminó la dependencia a mockProducts en destacados y gallery
-    const testimonials = [
-        {
-            name: "María P.",
-            quote: "La cama es fantástica, mi perro duerme mejor.",
-            meta: "Santa Cruz",
-            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop",
-        },
-        {
-            name: "Carlos R.",
-            quote: "Calidad y diseño, súper recomendados.",
-            meta: "Cochabamba",
-            avatar: "https://images.unsplash.com/photo-1545996124-1a8cbb0f0b5f?w=200&auto=format&fit=crop",
-        },
-    ];
 
-    const heroImage = "src/assets/hero.webp";
+    const heroImage = "../hero.webp";
 
     // Framer Motion variants
     const container = {
@@ -132,7 +114,7 @@ export default function Home() {
                         </Link>
 
                         <a
-                            href={`https://wa.me/59170000000?text=${encodeURIComponent(
+                            href={`https://wa.me/59170049343?text=${encodeURIComponent(
                                 "Hola, quiero más información sobre sus productos."
                             )}`}
                             target="_blank"
@@ -326,7 +308,7 @@ export default function Home() {
                         </Link>
 
                         <a
-                            href={`https://wa.me/59170000000?text=${encodeURIComponent("Hola! quiero asistencia personalizada")}`}
+                            href={`https://wa.me/59170049343?text=${encodeURIComponent("Hola! quiero asistencia personalizada")}`}
                             className="border-2 border-brand text-brand bg-white px-8 py-4 rounded-lg font-heading font-semibold 
                                                 hover:bg-brand hover:text-white transition-colors duration-300 flex items-center justify-center gap-2 text-lg"
                         >
